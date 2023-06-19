@@ -124,4 +124,6 @@ backend web_servers    # секция бэкенд
 
 - HAproxy статистика, где видно количество обращений:
 
+  ![Stat](img/haproxy_stat.JPG)
+
       
