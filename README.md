@@ -55,7 +55,7 @@
 
   - Установим HAproxy и пропишем следующий конфиг:
 
-```
+    ```
 global
         log /dev/log    local0
         log /dev/log    local1 notice
@@ -117,7 +117,7 @@ backend web_servers    # секция бэкенд
         http-check expect status 200
         server s1 127.0.0.1:8888 check
         server s2 127.0.0.1:9999 check
-```
+    ```
 
 Хочу отметить, что с конфигурацией, которая была по ссылке, сервис у меня не запустился, пришлось чуть подправить.  
 
