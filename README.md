@@ -56,7 +56,7 @@
   - Установим HAproxy и пропишем следующий конфиг:
 
     ```
-global
+    global
         log /dev/log    local0
         log /dev/log    local1 notice
         chroot /var/lib/haproxy
@@ -78,7 +78,7 @@ global
         ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
         ssl-default-bind-options no-sslv3
 
-defaults
+    defaults
         log     global
         mode    http
         option  httplog
@@ -95,7 +95,7 @@ defaults
         errorfile 504 /etc/haproxy/errors/504.http
 
 
-listen stats  # веб-страница со статистикой
+    listen stats  # веб-страница со статистикой
         bind                    :888
         mode                    http
         stats                   enable
@@ -103,14 +103,14 @@ listen stats  # веб-страница со статистикой
         stats refresh           5s
         stats realm             Haproxy\ Statistics
 
-frontend example  # секция фронтенд
+    frontend example  # секция фронтенд
         mode http
         bind :8088
         default_backend web_servers
 #       acl ACL_example.com hdr(host) -i example.com
 #       use_backend web_servers if ACL_example.com
 
-backend web_servers    # секция бэкенд
+    backend web_servers    # секция бэкенд
         mode http
         balance roundrobin
 #        option httpchk
