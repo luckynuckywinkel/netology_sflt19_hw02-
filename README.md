@@ -107,13 +107,13 @@
         mode http
         bind :8088
         default_backend web_servers
-#       acl ACL_example.com hdr(host) -i example.com
-#       use_backend web_servers if ACL_example.com
+    #       acl ACL_example.com hdr(host) -i example.com
+    #       use_backend web_servers if ACL_example.com
 
     backend web_servers    # секция бэкенд
         mode http
         balance roundrobin
-#        option httpchk
+    #        option httpchk
         http-check expect status 200
         server s1 127.0.0.1:8888 check
         server s2 127.0.0.1:9999 check
