@@ -122,8 +122,65 @@
 Хочу отметить, что с конфигурацией, которая была по ссылке, сервис у меня не запустился, пришлось чуть подправить.  
 
 
-- HAproxy статистика, где видно количество обращений:
+- HAproxy статистика, где видно количество обращений к нескольким серверам:
 
   ![Stat](img/haproxy_stat.JPG)
 
+### Задание 1  
+
+- Запустите три simple python сервера на своей виртуальной машине на разных портах
+- Настройте балансировку Weighted Round Robin на 7 уровне, чтобы первый сервер имел вес 2, второй - 3, а третий - 4
+- HAproxy должен балансировать только тот http-трафик, который адресован домену example.local
+- На проверку направьте конфигурационный файл haproxy, скриншоты, где видно перенаправление запросов на разные серверы при обращении к HAProxy c использованием домена example.local и без него.
+
+- Запустим три simple pythin сервера и проверим их работоспособность:
+
+```
+    root@haproxy:/home/vagrant/hw/html3# python3 -m http.server 7777 --bind 0.0.0.0 &
+[1] 2211
+root@haproxy:/home/vagrant/hw/html3# Serving HTTP on 0.0.0.0 port 7777 (http://0.0.0.0:7777/) ...
+
+root@haproxy:/home/vagrant/hw/html3# curl http://localhost:7777
+127.0.0.1 - - [20/Jun/2023 07:03:41] "GET / HTTP/1.1" 200 -
+Server 1 Port 7777
+root@haproxy:/home/vagrant/hw/html3# curl http://localhost:8888
+curl: (52) Empty reply from server
+root@haproxy:/home/vagrant/hw/html3# systemctl stop haproxy
+root@haproxy:/home/vagrant/hw/html3# lsof -i :9999
+COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+python3 1982 root    3u  IPv4  27824      0t0  TCP *:9999 (LISTEN)
+root@haproxy:/home/vagrant/hw/html3# kill 1982
+root@haproxy:/home/vagrant/hw/html3# lsof -i :8888
+COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+python3 1939 root    3u  IPv4  24471      0t0  TCP *:8888 (LISTEN)
+root@haproxy:/home/vagrant/hw/html3# kill 1939
+root@haproxy:/home/vagrant/hw/html3# cd ..
+root@haproxy:/home/vagrant/hw# cd html1
+root@haproxy:/home/vagrant/hw/html1# python3 -m http.server 8888 --bind 0.0.0.0 &
+[2] 2223
+root@haproxy:/home/vagrant/hw/html1# Serving HTTP on 0.0.0.0 port 8888 (http://0.0.0.0:8888/) ...
+
+root@haproxy:/home/vagrant/hw/html1#
+root@haproxy:/home/vagrant/hw/html1# cd ..
+root@haproxy:/home/vagrant/hw# cd html2
+root@haproxy:/home/vagrant/hw/html2# python3 -m http.server 9999 --bind 0.0.0.0 &
+[3] 2227
+root@haproxy:/home/vagrant/hw/html2# Serving HTTP on 0.0.0.0 port 9999 (http://0.0.0.0:9999/) ...
+
+root@haproxy:/home/vagrant/hw/html2#
+root@haproxy:/home/vagrant/hw/html2#
+root@haproxy:/home/vagrant/hw/html2#
+root@haproxy:/home/vagrant/hw/html2# curl http://localhost:8888
+127.0.0.1 - - [20/Jun/2023 07:05:27] "GET / HTTP/1.1" 200 -
+Server 1 Port 8888
+root@haproxy:/home/vagrant/hw/html2# curl http://localhost:9999
+127.0.0.1 - - [20/Jun/2023 07:05:31] "GET / HTTP/1.1" 200 -
+Server 1 Port 9999
+root@haproxy:/home/vagrant/hw/html2# curl http://localhost:7777
+127.0.0.1 - - [20/Jun/2023 07:05:35] "GET / HTTP/1.1" 200 -
+Server 1 Port 7777
+
+```
+
+     
       
