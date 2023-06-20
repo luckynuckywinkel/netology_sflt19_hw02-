@@ -185,5 +185,28 @@ Server 1 Port 7777
 
 ```
 
+
+- Внесем изменения в конфиг haproxy в соответствие с условиями:
+
+```
+frontend example  # секция фронтенд
+        mode http
+        bind :8088
+#        default_backend web_servers
+        acl ACL_example.com hdr(host) -i example.loacl
+        use_backend web_servers if ACL_example.com
+
+backend web_servers    # секция бэкенд
+        mode http
+        balance roundrobin
+#        option httpchk
+        http-check expect status 200
+        server s1 127.0.0.1:8888 check weight 4
+        server s2 127.0.0.1:9999 check weight 3
+        server s3 127.0.0.1:7777 check weight 2
+
+```
+
+
      
       
