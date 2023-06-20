@@ -193,7 +193,7 @@ frontend example  # секция фронтенд
         mode http
         bind :8088
 #        default_backend web_servers
-        acl ACL_example.com hdr(host) -i example.loacl
+        acl ACL_example.com hdr(host) -i example.local
         use_backend web_servers if ACL_example.com
 
 backend web_servers    # секция бэкенд
