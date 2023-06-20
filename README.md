@@ -219,5 +219,82 @@ backend web_servers    # секция бэкенд
 
   Похоже, все удалось.
 
+
+
+### Задание 3  
+
+- Настройте связку HAProxy + Nginx как было показано на лекции.
+- Настройте Nginx так, чтобы файлы .jpg выдавались самим Nginx (предварительно разместите несколько тестовых картинок в директории /var/www/), а остальные запросы переадресовывались на HAProxy, который в свою очередь переадресовывал их на два Simple Python server.
+- На проверку направьте конфигурационные файлы nginx, HAProxy, скриншоты с запросами jpg картинок и других файлов на Simple Python Server, демонстрирующие корректную настройку.  
+
+### Решение:  
+
+- Картинка была положена по пути /var/www/html;
+- В nginx.conf был добавлен следующий блок:
+```
+ listen 80;
+        server_name localhost;
+
+        location / {
+            try_files $uri @haproxy @nginx;
+        }
+
+        location @haproxy {
+            proxy_pass http://127.0.0.1:8088;
+        }
+
+        location @nginx {
+            root /var/www/html;
+            index index.nginx-debian.html;
+        }
+
+        location ~ \.jpg {
+            root /var/www/html;
+        }
+    }
+}
+```
+Конфигурация Haproxy:  
+
+```
+listen stats  # веб-страница со статистикой
+        bind                    :888
+        mode                    http
+        stats                   enable
+        stats uri               /stats
+        stats refresh           5s
+        stats realm             Haproxy\ Statistics
+
+frontend example  # секция фронтенд
+        mode http
+        bind :8088
+        default_backend web_servers
+#       acl ACL_example.com hdr(host) -i example.local
+#       use_backend web_servers if ACL_example.com
+
+backend web_servers    # секция бэкенд
+        mode http
+        balance roundrobin
+#        option httpchk
+        http-check expect status 200
+        server s1 127.0.0.1:8888 check weight 4
+        server s2 127.0.0.1:9999 check weight 3
+        server s3 127.0.0.1:7777 check weight 2
+```  
+
+Пробуем идти по ip:  
+
+![8888](img/8888.JPG)  
+
+Картинка:  
+
+![pic](img/pic.JPG)
+
+С основной задачей он справился. Меня прокси-пассило на Haproxy и я гулял между пайтон-серверами, и мог открывать картинку. В этом же коде я попытался сделать так, чтобы при выключенном Haproxy меня возвращало на nginx. 
+ 
+К сожалению, у меня не получилось и по адресу http://localhost я имел 502й ответ. Пробовал многие варианты - ничего не вышло.    
+
+Буду рад, если подскажете, как сделать то, что я задумал.
+
  
       
